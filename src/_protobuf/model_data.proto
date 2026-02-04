@@ -1,0 +1,43 @@
+syntax = 'proto3';
+
+package messages;
+
+message FromIPCM{
+    message ModelData {
+        message Data {
+            string tagname = 1;
+            int64 timestamp = 2;
+            double value = 3;
+            uint32 status_code = 4;
+            bool is_ignored = 5;
+        }
+
+        string model_type = 1;
+        string model_key = 2;
+        repeated Data data = 3;
+    }
+
+    repeated ModelData model_data = 1;
+}
+
+
+message ToIPCM{
+    message ModelData {
+        message Data {
+            string tagname = 1;
+            double pred = 2;
+            double index = 3;
+            uint32 status_pred = 4;
+            uint32 status_index = 5;
+        }
+
+        string model_key = 1;
+        int64 timestamp = 2;
+        double index = 3;
+        uint32 status_index = 4;
+        repeated Data data = 5;
+    }
+
+    repeated ModelData model_data = 1;
+}
+
