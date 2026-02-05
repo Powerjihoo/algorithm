@@ -40,9 +40,9 @@ class AlarmSetting(BaseModel):
 
 class TagSetting(BaseModel):
     tagName: str = Field(default="", alias="tagName")
-    indexalarm: bool = Field(default=False, alias="indexAlarm")     ####일단 그냥 둠
-    noncalc: bool = Field(default=False, alias="nonCalc")       ############################################### non/calc추가
+    indexalarm: bool = Field(default=False, alias="indexAlarm") #####################보류
     indexweight: float = Field(default=1.0, alias="indexWeight")
+    noncalc: bool = Field(default=False, alias="nc")       ############################################### non/calc추가
     alarmSetting: AlarmSetting = Field(alias="alarmSetting")
 
 
@@ -74,6 +74,7 @@ class ModelSetting(BaseModel):
     
     indexalarm: bool = Field(default=False, alias="indexAlarm")
     indexweight: float = Field(default=1.0, alias="indexWeight")
+    noncalc: bool = Field(default=False, alias="nc")
     systemidx: int = Field(default=-1, alias="systemIdx")
     systemname: str = Field(default="", alias="systemName")
     parentidx: int = Field(default=-1, alias="parentIdx")

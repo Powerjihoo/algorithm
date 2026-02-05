@@ -107,13 +107,14 @@ class AAKRManager(PredModelManagerBase, metaclass=SingletonInstance):
                 if pred_model.index_calculator_model is not None:
                     model_setting: ModelSetting = pred_model.model_setting  
 
-                    active_tagnames = [tag_setting.tagName for tag_setting in model_setting.tagsettinglist.values() if tag_setting.indexalarm]
+                    active_tagnames = [tag_setting.tagName for tag_setting in model_setting.tagsettinglist.values() if not tag_setting.noncalc]
                     index_ary = np.array([pred_model.model_tag_data.data[tagname].index.values[-1] for tagname in active_tagnames])
                     status_ary = np.array([pred_model.model_tag_data.data[tagname].index.statuscodes[-1] for tagname in active_tagnames])
 
                     pred_model.index_calculator_model.calc_index(
                         index_ary=index_ary,
                         status_ary=status_ary,
+                        priority=model_setting.indexpriority
                     )
 
                 pred_model.set_calculated()

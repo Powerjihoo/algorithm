@@ -80,13 +80,60 @@ class _ModelIndexCalcTagImportance(_ModelIndexCalculatorBase):
         calc_index(): Calculate the index using Tag Importance based model index.
     """
 
+    # @classmethod
+    # def calc_index(
+    #     cls,
+    #     index_ary: np.array,
+    #     status_ary: np.array,
+    #     weights_ary: np.array,
+    #     importances_ary: np.array,
+    # ) -> float:
+    #     """
+    #     Calculate the index using Tag Importance based model index.
+
+    #     Args:
+    #         index_ary (np.array): Array of index values.
+    #         weights_ary (np.array): Array of weights corresponding to index values.
+    #         importances_ary (np.array): Array indicating the importance of index values.
+
+    #     Returns:
+    #         float: The calculated model index value.
+    #     """
+    #     _target_idx_not_none = ~np.isnan(index_ary)
+    #     _target_idx = np.logical_and(_target_idx_not_none, (status_ary>=192))
+    #     if not np.any(_target_idx):
+    #         raise IndexCalculateError("Can not calculate model index")
+
+    #     target_index_ary = index_ary[_target_idx]
+    #     target_weights_ary = weights_ary[_target_idx]
+
+    #     _index_weighted_ary = target_index_ary * target_weights_ary
+    #     _weighted_avg = _index_weighted_ary.sum() / (target_weights_ary.sum())
+    #     _weighted_index_ary = np.clip(
+    #         1 - (1 - target_index_ary) * target_weights_ary, 0, 1
+    #     )
+    #     try:
+    #         _weighted_min = min(_weighted_index_ary)
+    #     except ValueError:
+    #         _weighted_min = None
+    #     _sub_avg = (_weighted_avg + _weighted_min) / 2
+
+    #     try:
+    #         _importance_min = np.min(index_ary[importances_ary])
+    #     except ValueError:
+    #         _importance_min = 1
+
+    #     index_final = min(_sub_avg, _importance_min)
+    #     return index_final
+
+
     @classmethod
     def calc_index(
         cls,
         index_ary: np.array,
         status_ary: np.array,
         weights_ary: np.array,
-        priority_ary: np.array,
+        priority: bool,
     ) -> float:
         """
         Calculate the index using Tag Importance based model index.
@@ -94,7 +141,7 @@ class _ModelIndexCalcTagImportance(_ModelIndexCalculatorBase):
         Args:
             index_ary (np.array): Array of index values.
             weights_ary (np.array): Array of weights corresponding to index values.
-            priority_ary (np.array): Array indicating the importance of index values.
+            importances_ary (np.array): Array indicating the importance of index values.
 
         Returns:
             float: The calculated model index value.
@@ -103,6 +150,9 @@ class _ModelIndexCalcTagImportance(_ModelIndexCalculatorBase):
         _target_idx = np.logical_and(_target_idx_not_none, (status_ary>=192))
         if not np.any(_target_idx):
             raise IndexCalculateError("Can not calculate model index")
+        
+        if priority:
+            return np.nanmin(index_ary)
 
         target_index_ary = index_ary[_target_idx]
         target_weights_ary = weights_ary[_target_idx]
@@ -117,13 +167,4 @@ class _ModelIndexCalcTagImportance(_ModelIndexCalculatorBase):
         except ValueError:
             _weighted_min = None
         _sub_avg = (_weighted_avg + _weighted_min) / 2
-
-        if priority_ary is None:
-            return _sub_avg
-        try:
-            _importance_min = np.min(index_ary[priority_ary])
-        except ValueError:
-            _importance_min = 1
-
-        index_final = min(_sub_avg, _importance_min)
-        return index_final
+        return _sub_avg

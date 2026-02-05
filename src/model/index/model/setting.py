@@ -70,12 +70,12 @@ class ModelIndexCalculatorTagImportance(ModelIndexCalculatorBase):
     setting: ModelIndexSettingTagImportance
     calculator: Type[_ModelIndexCalcTagImportance] = _ModelIndexCalcTagImportance
 
-    def calc_index(self, index_ary: np.array, status_ary: np.array, priority_ary: np.array = None) -> None:
+    def calc_index(self, index_ary: np.array, status_ary: np.array, priority: bool) -> None:
         try:
             index = self.calculator.calc_index(
                 index_ary,
                 status_ary,
-                priority_ary,
+                priority,
                 self.setting.weights_ary,
             )
             self.data.index = index
