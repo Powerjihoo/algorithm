@@ -2,16 +2,14 @@ from queue import Empty as QueueEmpty
 from typing import List, Optional
 
 import numpy as np
-import pandas as pd
+
 from dbinfo.model_info import ModelInfoManager
 from dbinfo.tag_value import ModelTagValueQueue
-from utils.logger import logger, logging_time
-from utils.scheme.singleton import SingletonInstance
-
 from model.manager.common import PredModelManagerBase
 from model.prediction.annoy import ANNOY
 from model.prediction.base_model import ModelArrayData, PredictionModelBase
-from api_server.models.models import ModelSetting
+from utils.logger import logger, logging_time
+from utils.scheme.singleton import SingletonInstance
 
 model_tag_value_queue = ModelTagValueQueue()
 
@@ -93,15 +91,16 @@ class ANNOYManager(PredModelManagerBase, metaclass=SingletonInstance):
                         status_code=index_calculator.data.index.statuscodes[-1],
                     )
                 if pred_model.index_calculator_model is not None:
-                    model_setting: ModelSetting = pred_model.model_setting  
+                    _model_info = ModelInfoManager.get(model_key)
 
-                    active_tagnames = [tag_setting.tagName for tag_setting in model_setting.tagsettinglist.values() if tag_setting.indexalarm]
+                    active_tagnames = [tag_setting.tagName for tag_setting in _model_info.tagsettinglist.values() if tag_setting.indexalarm]
                     index_ary = np.array([pred_model.model_tag_data.data[tagname].index.values[-1] for tagname in active_tagnames])
                     status_ary = np.array([pred_model.model_tag_data.data[tagname].index.statuscodes[-1] for tagname in active_tagnames])
 
                     pred_model.index_calculator_model.calc_index(
                         index_ary=index_ary,
                         status_ary=status_ary,
+                        priority=_model_info.indexpriority
                     )
                 
                 pred_model.set_calculated()

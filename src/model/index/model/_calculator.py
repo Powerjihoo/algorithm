@@ -146,25 +146,21 @@ class _ModelIndexCalcTagImportance(_ModelIndexCalculatorBase):
         Returns:
             float: The calculated model index value.
         """
-        _target_idx_not_none = ~np.isnan(index_ary)
-        _target_idx = np.logical_and(_target_idx_not_none, (status_ary>=192))
+        _target_idx = (~np.isnan(index_ary)) & (status_ary >= 192)
+
         if not np.any(_target_idx):
             raise IndexCalculateError("Can not calculate model index")
-        
+
         if priority:
-            return np.nanmin(index_ary)
+            return np.nanmin(index_ary[_target_idx])
 
         target_index_ary = index_ary[_target_idx]
         target_weights_ary = weights_ary[_target_idx]
 
         _index_weighted_ary = target_index_ary * target_weights_ary
-        _weighted_avg = _index_weighted_ary.sum() / (target_weights_ary.sum())
-        _weighted_index_ary = np.clip(
-            1 - (1 - target_index_ary) * target_weights_ary, 0, 1
-        )
-        try:
-            _weighted_min = min(_weighted_index_ary)
-        except ValueError:
-            _weighted_min = None
+        weight_sum = target_weights_ary.sum()
+        _weighted_avg = _index_weighted_ary.sum() / weight_sum
+        
+        _weighted_min = _index_weighted_ary.min()
         _sub_avg = (_weighted_avg + _weighted_min) / 2
         return _sub_avg

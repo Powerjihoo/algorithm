@@ -134,15 +134,14 @@ class PredModelManagerBase(dict):
             )
         index_calculators_tag = self.__create_index_calculators_tag(model_setting)
         index_calculator_model = self.__create_index_calculator_model(model_setting)
+        
         prediction_model.attach_index_calculators_tag(index_calculators_tag)
         prediction_model.attach_index_calculator_model(index_calculator_model)
 
         self[model_key] = Model(pred=prediction_model)
-
+    
     @measure_memory
-    def __create_index_calculators_tag(
-        self, model_setting
-    ) -> dict[str, TTagIndexSetting]:
+    def __create_index_calculators_tag(self, model_setting: ModelSetting) -> dict[str, TTagIndexSetting]:
         index_calculators_tag = {}
         for tagname, tag_setting in model_setting.tagsettinglist.items():
             alarm_type, alarm_setting = get_enabled_alarm_type(tag_setting.alarmSetting)
@@ -150,8 +149,7 @@ class PredModelManagerBase(dict):
                 alarm_type, alarm_setting
             )
             index_calculators_tag[
-                tagname
-            ]: TTagIndexSetting = self.__create_tag_setting_data(
+                tagname]: TTagIndexSetting = self.__create_tag_setting_data(
                 tagname, alarm_type, alarm_setting_data
             )
 
@@ -465,7 +463,7 @@ def get_enabled_alarm_type(
     alarm_settings: dict[TAlarmType, TAlarmSettingDB],
 ) -> tuple[TAlarmType, TAlarmSettingDB] | tuple[None, None]:
     for alarm_type, alarm_setting in alarm_settings.__dict__.items():
-        if alarm_setting.enable:
+        if alarm_type == "Threshold":
             return alarm_type, alarm_setting
     return None, None
 

@@ -15,7 +15,7 @@ class ModelInfoBase(BaseModel):
 
 
 class ThresholdSetting(BaseModel):
-    enable: bool
+    enable: bool = True
     threshold: float
     deadband: float
 

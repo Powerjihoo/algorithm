@@ -2,9 +2,7 @@ from queue import Empty as QueueEmpty
 from typing import List, Optional
 
 import numpy as np
-import pandas as pd
 
-from api_server.models.models import ModelSetting
 from dbinfo.model_info import ModelInfoManager
 from dbinfo.tag_value import ModelTagValueQueue
 from model.manager.common import PredModelManagerBase
@@ -104,17 +102,18 @@ class AAKRManager(PredModelManagerBase, metaclass=SingletonInstance):
                         index_value=index_calculator.data.index.values[-1],
                         status_code=index_calculator.data.index.statuscodes[-1],
                     )
-                if pred_model.index_calculator_model is not None:
-                    model_setting: ModelSetting = pred_model.model_setting  
 
-                    active_tagnames = [tag_setting.tagName for tag_setting in model_setting.tagsettinglist.values() if not tag_setting.noncalc]
+                if pred_model.index_calculator_model is not None:
+                    _model_info = ModelInfoManager.get(model_key)
+
+                    active_tagnames = [tag_setting.tagName for tag_setting in _model_info.tagsettinglist.values() if not tag_setting.noncalc]
                     index_ary = np.array([pred_model.model_tag_data.data[tagname].index.values[-1] for tagname in active_tagnames])
                     status_ary = np.array([pred_model.model_tag_data.data[tagname].index.statuscodes[-1] for tagname in active_tagnames])
 
                     pred_model.index_calculator_model.calc_index(
                         index_ary=index_ary,
                         status_ary=status_ary,
-                        priority=model_setting.indexpriority
+                        priority=_model_info.indexpriority
                     )
 
                 pred_model.set_calculated()
